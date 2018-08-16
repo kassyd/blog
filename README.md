@@ -1,6 +1,8 @@
 # 这也能算一个 blog 系统？！
 
-[预览 https://kassyd.github.io/wtf-blog/](https://kassyd.github.io/wtf-blog/)
+[预览我的blog地址 https://kassyd.github.io/blog/](https://kassyd.github.io/blog/)
+
+[原项目地址 https://github.com/FrankFang/wtf-blog](https://github.com/FrankFang/wtf-blog)
 
 ## 使用方法：
 
@@ -9,7 +11,7 @@
 	1. 滚动屏幕到「GitHub Pages」
 	2. 在 Source 那里选中 master branch
 	3. Save
-3. 看到「Your site is published at https://kassyd.github.io/wtf-blog/」
+3. 看到「Your site is published at https://kassyd.github.io/blog/」
 4. 好了，你的博客系统设置完毕了
 
 ## 如何写博客
@@ -30,3 +32,7 @@
 3. 稳定性非常好！只要 GitHub 不宕机，你的博客就不宕机
 4. 明显没有 BUG！
 
+## 说明
+
+1. 由于folk过来的项目commit不能够增加贡献值，特单独建了个仓库。
+2. 如果需要查看原作者仓库可以点击[原项目地址 https://github.com/FrankFang/wtf-blog](https://github.com/FrankFang/wtf-blog)
