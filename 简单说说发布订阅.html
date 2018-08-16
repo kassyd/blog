@@ -1,0 +1,69 @@
+<title></title>
+<meta name="description" content="">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<img class="logo" src="logo.png">
+
+<x-markdown>
+简单说说发布订阅
+=================
+
+众所周知，发布订阅在前端领域是非常常用的设计模式。所以此时此刻，我将写一篇博客来记录我学习此设计模式后的一些感悟。
+
+
+下面先看一个例子
+>我们先声明一个发布者的构造函数,那么它得有一个存储订阅者的数组,然后它得具有添加、删除、发布方法
+
+```
+	function Pub() {
+		this.subs = []
+	}
+	Pub.prototype.addSub = function() {
+		Array.prototype.forEach.call(arguments, el => this.subs.push(el))
+	}
+	Pub.prototype.removeSub = function() {
+		Array.prototype.forEach.call(arguments, el => {
+			var i = this.subs.indexOf(el)
+			this.subs.splice(i, 0)
+		})
+	}
+	Pub.prototype.notify = function(msg) {
+		this.subs.forEach(el => {
+			el.update(msg)
+		})
+	}
+```
+
+>然后我们再声明一个订阅者的构造函数，它的主要功能就是将发布者传过来的数据进行更新
+
+```
+	function Sub(name) {
+		this.name = name
+		this.msg = ''
+	}
+	Sub.prototype.update = function(msg) {
+		console.log('哈哈'+ this.name +'同学收到了来自pub传过来的消息---' + msg)
+		this.msg = msg
+	}
+```
+>此时我们创建一个学校的发布者与学生甲乙丙丁的订阅者，让学校广播给订阅过的学生
+
+```
+	var school = new Pub(),
+		student1 = new Sub('甲'),
+		student2 = new Sub('乙'),
+		student3 = new Sub('丙'),
+		student4 = new Sub('丁');
+	school.addSub(student1, student2, student3)
+	school.notify('请丁同学赶快来教导处！')
+```
+
+在浏览器下运行结果并打印可看到
+
+![blockchain](./发布订阅1.png "")
+
+这样就是一个简单的发布订阅模式了，是不是很好理解呢！哈哈，我的第一篇博客暂时就分享到这，以后还会继续完善。:-)
+</x-markdown>
+
+<link rel="stylesheet" href="css/default.css">
+<script src="js/marked.min.js"></script>
+<script src="js/main.js"></script>
