@@ -1,0 +1,34 @@
+<title></title>
+<meta name="description" content="">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<img class="logo" src="logo.png">
+
+<x-markdown>
+由发布订阅谈vue的声明式渲染
+=================
+###### (2018/8/17)
+
+上一篇文章给大家谈了发布订阅模式，相信大家对这个模式有了基本认识。这篇文章我希望能以这个模式为基础，去扩展一个vue的声明式渲染的雏形。如果还不是很懂发布订阅可以先看看这一篇——[简单说说发布订阅](简单说说发布订阅.html)。
+
+那我们就开始了！！！
+>[先看vue官网的例子](https://cn.vuejs.org/v2/guide/#%E5%A3%B0%E6%98%8E%E5%BC%8F%E6%B8%B2%E6%9F%93.html)
+
+```
+< div id="app">
+	{{ message }}
+< /div>
+
+var app = new Vue({
+	el: '#app',
+	data: {
+		message: 'Hello Vue!'
+	}
+})
+```
+
+>本人理解的声明式渲染就是一个由vm层到view层的单向绑定（如有不对的地方欢迎指正）
+</x-markdown>
+
+<link rel="stylesheet" href="css/default.css">
+<script src="js/marked.min.js"></script>
+<script src="js/main.js"></script>
