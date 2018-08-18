@@ -27,6 +27,77 @@ var app = new Vue({
 ```
 
 >本人理解vue的声明式渲染就是一个由vm层到view层的单向绑定（如有不对的地方请轻拍），即我改变data中的每个属性，他都会相应的更新到页面中。那么如果我们想要实现一个这样的功能，我们只需要为data中每个key创建一个发布者，然后为每个一个绑定key的dom节点创建一个订阅者，然后将他们一一对应收集起来。当data[key]值改变时进行notify，订阅者update触发响应回调函数更新视图。
+
+```
+< div v-text="name">
+< /div>
+< div v-text="name">
+< /div>
+< div v-text="age">
+< /div>
+< div v-text="class">
+< /div>
+
+function Pub() {
+  this.subs = []
+}
+Pub.target = null
+Pub.prototype.addSub = function() {
+  Array.prototype.forEach.call(arguments, el => this.subs.push(el))
+}
+Pub.prototype.removeSub = function() {
+  Array.prototype.forEach.call(arguments, el => {
+    var i = this.subs.indexOf(el)
+    this.subs.splice(i, 0)
+  })
+}
+Pub.prototype.notify = function(val) {
+  this.subs.forEach(el => {
+    el.update(val)
+  })
+}
+function Sub(vm, key, el) {
+  this.vm = vm
+  this.key = key
+  this.el = el
+  this.el.innerHTML = this.get()
+}
+Sub.prototype.update = function(val) {
+  console.log('收到值' + val)
+  this.el.innerHTML = val
+}
+Sub.prototype.get = function() {
+  Pub.target = this
+  var val = this.vm[this.key]
+  Pub.target = null
+  return val
+}
+var data = {
+  name: "zyq",
+  age: '18',
+  class: '1'
+}
+Object.keys(data).forEach(key => {
+  var val = data[key]
+  var dep = new Pub()
+  Object.defineProperty(data, key, {
+    set(newVal) {
+      val = newVal
+      dep.notify(val)
+    },
+    get() {
+      Pub.target && dep.addSub(Pub.target)
+      return val
+    }
+  })
+})
+var directives = ['v-text']
+var els = document.querySelectorAll('[' + directives[0] + ']')
+Array.from(els).forEach(el => {
+  var key = el.getAttribute(directives[0])
+  var sub = new Sub(data, key, el)
+})
+```  
 </x-markdown>
 
 <link rel="stylesheet" href="css/default.css">
