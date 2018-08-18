@@ -26,7 +26,7 @@ var app = new Vue({
 })
 ```
 
->本人理解的声明式渲染就是一个由vm层到view层的单向绑定（如有不对的地方欢迎指正）
+>本人理解vue的声明式渲染就是一个由vm层到view层的单向绑定（如有不对的地方请轻拍），即我改变data中的每个属性，他都会相应的更新到页面中。那么如果我们想要实现一个这样的功能，我们只需要为data中每个key创建一个发布者，然后为每个一个绑定key的dom节点创建一个订阅者，然后将他们一一对应收集起来。当data[key]值改变时进行notify，订阅者update触发响应回调函数更新视图。
 </x-markdown>
 
 <link rel="stylesheet" href="css/default.css">
