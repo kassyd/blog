@@ -6,7 +6,7 @@
 <x-markdown>
 由发布订阅谈vue的声明式渲染
 =================
-###### (2018/8/17)
+###### (2018/8/19)
 
 上一篇文章给大家谈了发布订阅模式，相信大家对这个模式有了基本认识。这篇文章我希望能以这个模式为基础，去扩展一个vue的声明式渲染的雏形。如果还不是很懂发布订阅可以先看看这一篇——[简单说说发布订阅](简单说说发布订阅.html)。
 
@@ -26,18 +26,11 @@ var app = new Vue({
 })
 ```
 
->本人理解vue的声明式渲染就是一个由vm层到view层的单向绑定（如有不对的地方请轻拍），即我改变data中的每个属性，他都会相应的更新到页面中。那么如果我们想要实现一个这样的功能，我们只需要为data中每个key创建一个发布者，然后为每个一个绑定key的dom节点创建一个订阅者，然后将他们一一对应收集起来。当data[key]值改变时进行notify，订阅者update触发响应回调函数更新视图。
+>本人理解vue的声明式渲染就是一个由vm层到view层的单向绑定（如有不对的地方请轻拍），即我改变data中的每个属性，他都会相应的更新到页面中。那么如果我们想要实现一个这样的功能，我们只需要为data中每个key创建一个发布者，然后为每个一个绑定key的dom节点创建一个订阅者，然后将他们一一对应收集起来。当data[key]值改变时进行notify，订阅者update触发响应回调函数更新视图。接下来我们将通过自定义指令v-text将数据绑定到对应标签。
+
+>首先创建一个发布者构造函数，Pub.target是用来存储当前sub实例的。
 
 ```
-< div v-text="name">
-< /div>
-< div v-text="name">
-< /div>
-< div v-text="age">
-< /div>
-< div v-text="class">
-< /div>
-
 function Pub() {
   this.subs = []
 }
@@ -56,6 +49,11 @@ Pub.prototype.notify = function(val) {
     el.update(val)
   })
 }
+```
+
+>然后创建一个订阅者构造函数,并在创建其实例的时候调一次get方法，其目的是初始化依赖收集。因为当sub的get方法被调用时，我们会触发vm[key]的get方法。所以只要我们将vm[key]的get方法重写去收集当前sub也就是Pub.target，即可将vm的每个key与其订阅者对应起来。当vm[key]改变时notify，即可发布到每个对应的订阅者。
+
+```
 function Sub(vm, key, el) {
   this.vm = vm
   this.key = key
@@ -72,32 +70,73 @@ Sub.prototype.get = function() {
   Pub.target = null
   return val
 }
-var data = {
-  name: "zyq",
+```
+
+>为了减少逻辑我们直接对vm进行数据劫持且默认vm中的属性都为基本类型，且为每个key创建一个发布者。而compile函数主要的任务就是为每个带有v-text属性的dom节点创建一个订阅者。
+
+```
+function observe(vm) {
+  Object.keys(vm).forEach(key => {
+    var val = vm[key]
+    var dep = new Pub()
+    Object.defineProperty(vm, key, {
+      set(newVal) {
+        val = newVal
+        dep.notify(val)
+      },
+      get() {
+        Pub.target && dep.addSub(Pub.target)
+        return val
+      }
+    })
+  })  
+}
+function compile(vm) {
+  var els = document.querySelectorAll('[v-text]')
+  Array.from(els).forEach(el => {
+    var key = el.getAttribute('v-text')
+    var sub = new Sub(vm, key, el)
+  })
+}
+function Vue(data) {
+  this.data = data
+  observe(this.data)
+  compile(this.data)
+}
+```
+
+>好！一个简单vue雏形就写完了接下来我们使用一下。
+
+```
+< div v-text="name">
+< /div>
+< div v-text="name">
+< /div>
+< div v-text="age">
+< /div>
+< div v-text="class">
+< /div>
+
+var vm = new Vue({
+  name: 'Jack',
   age: '18',
   class: '1'
-}
-Object.keys(data).forEach(key => {
-  var val = data[key]
-  var dep = new Pub()
-  Object.defineProperty(data, key, {
-    set(newVal) {
-      val = newVal
-      dep.notify(val)
-    },
-    get() {
-      Pub.target && dep.addSub(Pub.target)
-      return val
-    }
-  })
 })
-var directives = ['v-text']
-var els = document.querySelectorAll('[' + directives[0] + ']')
-Array.from(els).forEach(el => {
-  var key = el.getAttribute(directives[0])
-  var sub = new Sub(data, key, el)
-})
-```  
+```
+![](./vue声明式渲染1.png "")
+
+>改变数据值
+
+```
+vm.data.name = 'Tom'
+vm.data.age = '25'
+vm.data.class = '2'
+```
+
+![](./vue声明式渲染2.png "")
+![](./vue声明式渲染3.png "")
+
+成功啦！这样一个简单的vue声明式渲染功能就完成了，是不是很简单。当然，真正的vue实现的比我们想象的要复杂的多，这里尽可能简化逻辑希望只把有关发布订阅模式的部分展现出来，大家是不是对这个模式有了更深刻的认识了呢?:)
 </x-markdown>
 
 <link rel="stylesheet" href="css/default.css">
