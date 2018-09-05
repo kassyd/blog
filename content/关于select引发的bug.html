@@ -6,9 +6,10 @@
 <x-markdown>
 关于select引发的bug
 =================
-###### (2018/9/3)
+###### (2018/9/5)
 
 最近用vue重构之前的项目，遇到一个奇怪的bug。话不多说，先上[代码](http://jsbin.com/xomabarata/edit?html,js,output)。
+
 可以看到我现在的需求是，select框中的选项需要依赖于input框中的输入部分，且select框的内容必须在input触发blur事件之后更新。最开始我心想：“这还不简单吗，我用.lazy修饰符不久好了吗？vue真的是太方便了！”不料10秒钟之后，当我输入12完点击select时，马上被打脸。
 
 ![](../img/关于select引发的bug1.png "")
@@ -18,6 +19,7 @@ select中有几项时空白的！黑人问号脸.jpg？？？冷静下来，仔�
 2. 失去焦点后，Vue 添加更新select的任务到队列里
 3. select 弹出空白选项
 4. 更新select的任务现在执行，于是 select 被更新
+
 接下来我们再做几个[测试](http://jsbin.com/qudedomovi/edit?html,js,output)。
 点击select之后等待3秒可以看到如图
 
