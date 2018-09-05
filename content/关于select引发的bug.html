@@ -13,12 +13,18 @@
 
 ![](../img/关于select引发的bug1.png "")
 
-select中有几项时空白的！黑人问号脸.jpg？？？冷静下来，仔细思考之后我大概就猜到是什么原因了。试着输入完之后先点击空白处，再点击select。正常展示！果然。。。所有信息都告诉我，点击select这一操作的浏览器执行顺序是
+select中有几项时空白的！黑人问号脸.jpg？？？冷静下来，仔细思考之后我大概就猜到是什么原因了。试着输入完之后先点击空白处，再点击select。正常展示！果然。。。所有信息都告诉我，点击select这一操作的浏览器执行顺序是：
 1. 点击select 时，失去焦点
 2. 失去焦点后，Vue 添加更新select的任务到队列里
 3. select 弹出空白选项
 4. 更新select的任务现在执行，于是 select 被更新
-接下来我们再做几个[测试](http://jsbin.com/dawotowevi/edit?html,js,output)。
+接下来我们再做几个[测试](http://jsbin.com/qudedomovi/edit?html,js,output)。
+点击select之后等待3秒可以看到如图
+
+![](../img/关于select引发的bug2.png "")
+
+这样我们就可以知道当select处于展开状态时，里面的文本可以更新，但是dom是无法更新的。到这里我终于恍然大悟，为啥之前看那些UI框架都是用的ul、li去实现select了。以前只以为是为了方便样式好看，现在才知道还可以解决原生select的诸多限制。
+好了，这篇文章就写到这里，希望以后遇到这个问题能帮助到大家。
 
 </x-markdown>
 
