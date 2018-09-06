@@ -137,6 +137,77 @@ vm.data.class = '2'
 ![](../img/vue声明式渲染3.png "")
 
 成功啦！这样一个简单的vue声明式渲染功能就完成了，是不是很简单。当然，真正的vue实现的比我们想象的要复杂的多，这里尽可能简化逻辑希望只把有关发布订阅模式的部分展现出来，大家是不是对这个模式有了更深刻的认识了呢?:)
+
+9月6号更新：上次说完声明式渲染，今天我们来说说双向绑定。其实看完上面代码之后，在实现双向绑定就变得非常简单了。就是在去监听input的oninput事件，然后把事件对象的value值赋给data[key]，而key就是v-model绑定的那个值。那接下来我们就来改上述代码，使代码能使用v-text与v-model指令
+
+```
+  < div id="app">
+    < input v-model="inputVal">
+    < p v-text="inputVal"></p>
+  < /div>
+```
+
+>首先我们找到compile方法获取带有v-text与v-model的所有节点，然后获取相应指令并传到Sub构造函数里面去。
+
+```
+function compile(vm) {
+  var els = document.querySelectorAll('[v-text],[v-model]'),
+      key,
+      directive;
+  Array.from(els).forEach(el => {
+    if(el.getAttribute('v-model')) {
+      key = el.getAttribute('v-model')
+      directive = 'v-model'
+    }else if(el.getAttribute('v-text')) {
+      key = el.getAttribute('v-text')
+      directive = 'v-text'
+    }
+    var sub = new Sub(vm, key, el, directive)
+  })
+}
+```
+
+>紧接着自然要去修改Sub函数，这里添加一个参数directive去区分不同指令，然后去监听所有绑定v-model属性的input事件，再赋值即可。
+
+```
+function Sub(vm, key, el, directive) {
+  this.vm = vm
+  this.key = key
+  this.el = el
+  this.directive = directive
+  if(directive === 'v-model') {
+    this.el.value = this.get()
+  el.oninput = function(e) {
+    vm[key] = e.target.value
+    this.value = vm[key]
+  }
+  }else if(directive === 'v-text') {
+    this.el.innerHTML = this.get()
+  }
+  
+}
+Sub.prototype.update = function(val) {
+  console.log('收到值' + val)
+  if(this.directive === 'v-model') {
+    this.el.value = val
+  }else if(this.directive === 'v-text') {
+    this.el.innerHTML = val
+  }
+}
+```
+
+>测试一下
+
+```
+var vm = new Vue({
+  inputVal: "hello world"
+})
+```
+
+![](../img/数据双向绑定1.png "")
+![](../img/数据双向绑定2.png "")
+
+到此为止，这个双向绑定功能就已经实现了，大家可以自行扩展更多的指令或者功能比如v-on、{{}}等等。
 </x-markdown>
 
 <link rel="stylesheet" href="../css/default.css">
